@@ -1,5 +1,4 @@
 # encoding: UTF-8
-
 import os
 import glob
 import numpy as np
@@ -11,7 +10,6 @@ video_src_dir = "../data/video_corpus.csv"
 
 video_data = pd.read_csv(video_src_dir, sep=',')
 video_data = video_data[video_data['Language'] == 'English']
-
 videoID_lists = list(video_data['VideoID'])
 videoID_start_lists = list(video_data['Start'])
 videoID_end_lists = list(video_data['End'])
@@ -62,7 +60,7 @@ for count, key in enumerate(map_videoID):
         for idx in indices:
             if type(video_descriptions_lists[idx]) == type(1.0):
                 continue
-        
+
             if '\\' in video_descriptions_lists[idx]:
                 print video_descriptions_lists[idx]
                 continue
@@ -70,7 +68,7 @@ for count, key in enumerate(map_videoID):
             if '"' in video_descriptions_lists[idx]:
                 print video_descriptions_lists[int(idx)]
                 continue
-        
+
             if "\n" in video_descriptions_lists[idx]:
                 print video_descriptions_lists[int(idx)]
                 continue
@@ -83,19 +81,19 @@ for count, key in enumerate(map_videoID):
         for ii, idx in enumerate(indices):
             if type(video_descriptions_lists[idx]) == type(1.0):
                 continue
-        
+
             if '\\' in video_descriptions_lists[idx]:
                 print video_descriptions_lists[idx]
                 continue
-        
+
             if '"' in video_descriptions_lists[idx]:
                 print video_descriptions_lists[int(idx)]
                 continue
-        
+
             if "\n" in video_descriptions_lists[idx]:
                 print video_descriptions_lists[int(idx)]
                 continue
-            
+
             if ii != len(indices)-1:
                 json_fd.write('{"image_id": ' + str(key) + ', "id": ' + str(id_count) + ', "caption": "' + str(video_descriptions_lists[idx]) + '"}, ')
                 id_count = id_count + 1
