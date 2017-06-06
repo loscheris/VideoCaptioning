@@ -4,3 +4,7 @@ rgb_train_features/
 rgb_test_features/
 S2VT_results.txt
 loss.txt
+coco_eval/generation.json
+coco_eval/map_videoID.pkl
+coco_eval/reference.json
+*.pyc

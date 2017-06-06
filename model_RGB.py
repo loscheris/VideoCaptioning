@@ -401,7 +401,7 @@ def train():
 
     loss_fd.close()
 
-def test(model_path='./models/model-100'):
+def test(model_path='./models'):
     test_data = get_video_test_data(video_test_data_path, video_test_feat_path)
     test_videos = test_data['video_path'].unique()
 
