@@ -8,3 +8,5 @@ coco_eval/generation.json
 coco_eval/map_videoID.pkl
 coco_eval/reference.json
 *.pyc
+ResNet-152/*
+rgb_features_resnet152/*

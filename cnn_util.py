@@ -55,7 +55,8 @@ class CNN(object):
 
             out = self.net.forward_all(blobs=[layers], **{'data':caffe_in})
             feats = out[layers]
-
+            print out.shape
+            print out[0][0][0][0]
             all_feats[start:end] = feats
 
         return all_feats

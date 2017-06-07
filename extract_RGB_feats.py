@@ -49,7 +49,10 @@ def main():
     vgg_model = '/home/zhiyong/caffe/models/vgg/VGG_ILSVRC_16_layers.caffemodel'
     vgg_deploy = '/home/zhiyong/caffe/models/vgg/VGG_ILSVRC_16_layers_deploy.prototxt'
     video_path = '/home/zhiyong/final_project/data/MSVD/YouTubeClips'
-    video_save_path = './rgb_feats'
+    video_save_path = './rgb_features_resnet152'
+    #resnet152_model = './ResNet-152/ResNet-152-model.caffemodel'
+    #resnet152_deploy = './ResNet-152/ResNet-152-deploy.prototxt'
+
     videos = os.listdir(video_path)
     videos = filter(lambda x: x.endswith('avi'), videos)
 
