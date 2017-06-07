@@ -1,5 +1,15 @@
 #-*- coding: utf-8 -*-
-
+'''
+functions to extract VGG (or any other) features from videos:
+For each video:
+1. extract frames from video (using Opencv)
+2. select n (n=80 in this case) frames
+3. rezie and crop the selected frames
+4.  For each frames:
+    1. feed to the VGG-16 model (providied with pre-trained weight, using Caffe)
+    2. obtain the VGG features: 1*4096
+5. obtain the VGG features of all n frames and store the result as an array (shape: n*4096)
+'''
 import cv2
 import os
 import ipdb
@@ -8,9 +18,8 @@ import pandas as pd
 import skimage
 from cnn_util import *
 
-
 def preprocess_frame(image, target_height=224, target_width=224):
-
+    #function to resize frames then crop
     if len(image.shape) == 2:
         image = np.tile(image[:,:,None], 3)
     elif len(image.shape) == 4:
@@ -19,19 +28,21 @@ def preprocess_frame(image, target_height=224, target_width=224):
     image = skimage.img_as_float(image).astype(np.float32)
     height, width, rgb = image.shape
     if width == height:
-        resized_image = cv2.resize(image, (target_height,target_width))
+        resized_image = cv2.resize(image, (target_width,target_height))
 
     elif height < width:
-        resized_image = cv2.resize(image, (int(width * float(target_height)/height), target_width))
-        cropping_length = int((resized_image.shape[1] - target_height) / 2)
+        #cv2.resize(src, dim) , where dim=(width, height)
+        #image.shape[0] returns height, image.shape[1] returns width, image.shape[2] reutrns 3 (3 RGB channels)
+        resized_image = cv2.resize(image, (int(width * float(target_height)/height), target_height))
+        cropping_length = int((resized_image.shape[1] - target_width) / 2)
         resized_image = resized_image[:,cropping_length:resized_image.shape[1] - cropping_length]
 
     else:
-        resized_image = cv2.resize(image, (target_height, int(height * float(target_width) / width)))
-        cropping_length = int((resized_image.shape[0] - target_width) / 2)
+        resized_image = cv2.resize(image, (target_width, int(height * float(target_width) / width)))
+        cropping_length = int((resized_image.shape[0] - target_height) / 2)
         resized_image = resized_image[cropping_length:resized_image.shape[0] - cropping_length,:]
 
-    return cv2.resize(resized_image, (target_height, target_width))
+    return cv2.resize(resized_image, (target_width, target_height))
 
 def main():
     num_frames = 80
@@ -61,6 +72,7 @@ def main():
         frame_list = []
 
         while True:
+            #extract frames from the video, where each frame is an array (height*width*3)
             ret, frame = cap.read()
             if ret is False:
                 break
@@ -71,10 +83,12 @@ def main():
         frame_list = np.array(frame_list)
 
         if frame_count > 80:
+            #select 80 frames if frame_cout is >80
             frame_indices = np.linspace(0, frame_count, num=num_frames, endpoint=False).astype(int)
             frame_list = frame_list[frame_indices]
 
         cropped_frame_list = np.array(map(lambda x: preprocess_frame(x), frame_list))
+        #cropped_frame_list is a list of frames, where each frame is a height*width*3 array
         feats = cnn.get_features(cropped_frame_list)
 
         save_full_path = os.path.join(video_save_path, video + '.npy')
@@ -82,4 +96,3 @@ def main():
 
 if __name__=="__main__":
     main()
-    

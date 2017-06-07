@@ -2,7 +2,6 @@
 import sys
 sys.path.append('/home/zhiyong/caffe/python')
 import caffe
-
 import ipdb
 import cv2
 import numpy as np
@@ -41,9 +40,7 @@ class CNN(object):
 
     def get_features(self, image_list, layers='fc7', layer_sizes=[4096]):
         iter_until = len(image_list) + self.batch_size
-        # we fill the zeros 
-        #num_frames = 80
-        #all_feats = np.zeros([num_frames] + layer_sizes)
+
         all_feats = np.zeros([len(image_list)] + layer_sizes)
 
         for start, end in zip(range(0, iter_until, self.batch_size), \
@@ -52,7 +49,7 @@ class CNN(object):
             image_batch = image_list[start:end]
 
             caffe_in = np.zeros(np.array(image_batch.shape)[[0,3,1,2]], dtype=np.float32)
-
+            #np.array(image_batch.shape)[[0,3,1,2]] to exchange the dimensions
             for idx, in_ in enumerate(image_batch):
                 caffe_in[idx] = self.transformer.preprocess('data', in_)
 
@@ -62,4 +59,3 @@ class CNN(object):
             all_feats[start:end] = feats
 
         return all_feats
-
