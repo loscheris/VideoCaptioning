@@ -1,6 +1,4 @@
 #-*- coding: utf-8 -*-
-__author__ = "Xinpeng.Chen"
-
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -96,7 +94,7 @@ class Video_Caption_Generator():
                 logit_words = tf.nn.xw_plus_b(output2, self.embed_word_W, self.embed_word_b)
                 cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logit_words, labels=onehot_labels)
                 cross_entropy = cross_entropy * caption_mask[:,i]
-                
+
                 probs.append(logit_words)
 
                 current_loss = tf.reduce_sum(cross_entropy)/self.batch_size
@@ -192,11 +190,12 @@ learning_rate = 0.0001
 def get_video_train_data(video_data_path, video_feat_path):
     video_data = pd.read_csv(video_data_path, sep=',')
     video_data = video_data[video_data['Language'] == 'English']
+    #apply function to each row (axis=1)
     video_data['video_path'] = video_data.apply(lambda row: row['VideoID']+'_'+str(int(row['Start']))+'_'+str(int(row['End']))+'.avi.npy', axis=1)
     video_data['video_path'] = video_data['video_path'].map(lambda x: os.path.join(video_feat_path, x))
     video_data = video_data[video_data['video_path'].map(lambda x: os.path.exists( x ))]
     video_data = video_data[video_data['Description'].map(lambda x: isinstance(x, str))]
-    
+
     unique_filenames = sorted(video_data['video_path'].unique())
     train_data = video_data[video_data['video_path'].map(lambda x: x in unique_filenames)]
     return train_data
@@ -219,6 +218,7 @@ def preProBuildWordVocab(sentence_iterator, word_count_threshold=5):
     word_counts = {}
     nsents = 0
     for sent in sentence_iterator:
+        #compute word occurrence
         nsents += 1
         for w in sent.lower().split(' '):
            word_counts[w] = word_counts.get(w, 0) + 1
@@ -272,7 +272,7 @@ def train():
     captions = map(lambda x: x.replace('/', ''), captions)
 
     wordtoix, ixtoword, bias_init_vector = preProBuildWordVocab(captions, word_count_threshold=0)
-    
+
     np.save("./data/wordtoix", wordtoix)
     np.save('./data/ixtoword', ixtoword)
     np.save("./data/bias_init_vector", bias_init_vector)
@@ -289,7 +289,7 @@ def train():
 
     tf_loss, tf_video, tf_video_mask, tf_caption, tf_caption_mask, tf_probs = model.build_model()
     sess = tf.InteractiveSession()
-    
+
     # my tensorflow version is 0.12.1, I write the saver with version 1.0
     saver = tf.train.Saver(max_to_keep=100)
     train_op = tf.train.AdamOptimizer(learning_rate).minimize(tf_loss)
@@ -454,4 +454,3 @@ def test(model_path='./models'):
         print generated_sentence,'\n'
         test_output_txt_fd.write(video_feat_path + '\n')
         test_output_txt_fd.write(generated_sentence + '\n\n')
-
